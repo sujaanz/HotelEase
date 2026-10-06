@@ -5,7 +5,7 @@ import axios from 'axios';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 
-// --- Public Pages ---
+// --- Public & Guest Pages ---
 import Home from './pages/public/Home';
 import RoomsSearch from './pages/public/RoomsSearch';
 import Auth from './pages/public/Auth';
@@ -14,8 +14,6 @@ import BookingCheckout from './pages/public/BookingCheckout';
 import Invoicing from './pages/public/Invoicing';
 import LegalPolicies from './pages/public/LegalPolicies';
 import SupportFeedback from './pages/public/SupportFeedback';
-
-// --- Guest Pages ---
 import GuestProfile from './pages/guest/GuestProfile';
 
 // --- Admin Pages ---
@@ -29,8 +27,7 @@ import BanquetEvents from './pages/admin/BanquetEvents';
 import ChannelManager from './pages/admin/ChannelManager';
 import StaffRostering from './pages/admin/StaffRostering';
 
-// মডার্ন আর্কিটেকচার: Axios Interceptor
-// এটি প্রতিবার API কল করার সময় ইউজারের টোকেনটি হেডারে (Headers) সেট করে দেবে
+// Axios Interceptor
 axios.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
@@ -75,6 +72,7 @@ function App() {
         <Navbar setCurrentPage={setCurrentPage} userRole={userRole} handleLogout={handleLogout} />
 
         <main className="py-2">
+          {/* Guest / Public Routing */}
           {currentPage === 'home' && <Home setCurrentPage={setCurrentPage} />}
           {currentPage === 'rooms' && <RoomsSearch rooms={rooms} setCurrentPage={setCurrentPage} />}
           {currentPage === 'auth' && <Auth setCurrentPage={setCurrentPage} setUserRole={setUserRole} />}
@@ -83,9 +81,9 @@ function App() {
           {currentPage === 'invoicing' && <Invoicing setCurrentPage={setCurrentPage} />}
           {currentPage === 'legal' && <LegalPolicies />}
           {currentPage === 'support' && <SupportFeedback />}
-
           {currentPage === 'profile' && <GuestProfile />}
 
+          {/* Admin Routing */}
           {currentPage === 'admin' && <AdminDashboard setCurrentPage={setCurrentPage} />}
           {currentPage === 'frontdesk' && <FrontDesk setCurrentPage={setCurrentPage} />}
           {currentPage === 'housekeeping' && <Housekeeping setCurrentPage={setCurrentPage} />}
