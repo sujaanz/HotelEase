@@ -4,20 +4,43 @@ import axios from 'axios';
 function FrontDesk() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [checkedInIds, setCheckedInIds] = useState([]);
 
-  // ফ্লাস্ক ব্যাকএন্ড থেকে সমস্ত বুকিংয়ের ডেটা নিয়ে আসা
-  useEffect(() => {
+  // ফ্লাস্ক ব্যাকএন্ড থেকে সমস্ত বুকিংয়ের ডেটা নিয়ে আসা
+  const fetchBookings = (isManualRefresh = false) => {
+    if (isManualRefresh) setIsRefreshing(true);
+    
     axios.get('http://127.0.0.1:5000/api/bookings')
       .then(response => {
-        // নতুন বুকিংগুলো যেন সবার উপরে থাকে তাই রিভার্স করে দেওয়া হলো
         setBookings(response.data.reverse()); 
         setLoading(false);
+        if (isManualRefresh) setTimeout(() => setIsRefreshing(false), 800);
       })
       .catch(error => {
         console.error("Error fetching bookings:", error);
         setLoading(false);
+        if (isManualRefresh) setIsRefreshing(false);
       });
+  };
+
+  useEffect(() => {
+    fetchBookings();
   }, []);
+
+  // ফাংশনাল চেক-ইন লজিক
+  const handleCheckIn = (bookingId) => {
+    setCheckedInIds(prev => [...prev, bookingId]);
+    setTimeout(() => {
+      alert(`Guest Check-in completed for Booking ID: BKG-${bookingId}`);
+    }, 500);
+  };
+
+  // লাইভ সার্চ ফিল্টার
+  const filteredBookings = bookings.filter(booking => 
+    booking.guest_name?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="max-w-[1400px] mx-auto px-4 py-6">
@@ -28,10 +51,11 @@ function FrontDesk() {
           <p className="text-xs font-bold text-gray-500 mt-1">Live Check-in & Guest Management</p>
         </div>
         <button 
-          onClick={() => window.location.reload()} 
-          className="bg-teal-50 text-teal-700 px-4 py-2 rounded-lg text-xs font-bold border border-teal-200 hover:bg-teal-100 transition shadow-sm"
+          onClick={() => fetchBookings(true)} 
+          disabled={isRefreshing}
+          className="bg-teal-50 text-teal-700 px-4 py-2 rounded-lg text-xs font-bold border border-teal-200 hover:bg-teal-100 transition shadow-sm disabled:opacity-50 flex items-center gap-2"
         >
-          🔄 Refresh Bookings
+          {isRefreshing ? '⏳ Refreshing...' : '🔄 Refresh Bookings'}
         </button>
       </div>
 
@@ -48,7 +72,10 @@ function FrontDesk() {
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center border-l-4 border-l-yellow-500">
           <div>
             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Pending Check-ins</p>
-            <h2 className="text-3xl font-black text-gray-900 mt-1">{bookings.filter(b => b.status === 'Confirmed').length}</h2>
+            {/* Checked-in হওয়া বুকিংগুলো মাইনাস করে দেখানো হচ্ছে */}
+            <h2 className="text-3xl font-black text-gray-900 mt-1">
+              {Math.max(0, bookings.length - checkedInIds.length)}
+            </h2>
           </div>
           <div className="w-12 h-12 bg-yellow-50 rounded-full flex items-center justify-center text-yellow-600 text-xl">🕒</div>
         </div>
@@ -57,7 +84,7 @@ function FrontDesk() {
           <div>
             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Total Revenue</p>
             <h2 className="text-3xl font-black text-gray-900 mt-1">
-               ${bookings.reduce((sum, booking) => sum + booking.total_amount, 0).toFixed(2)}
+               ${bookings.reduce((sum, booking) => sum + (booking.total_amount || 0), 0).toFixed(2)}
             </h2>
           </div>
           <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center text-blue-600 text-xl">💰</div>
@@ -87,7 +114,13 @@ function FrontDesk() {
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 lg:col-span-2">
           <div className="flex justify-between items-center mb-5 border-b border-gray-100 pb-3">
             <h3 className="text-sm font-black text-gray-800">Live Booking Activity</h3>
-            <input type="text" placeholder="Search Guest..." className="border border-gray-200 rounded-lg px-3 py-1.5 text-xs font-bold outline-none focus:border-teal-500" />
+            <input 
+              type="text" 
+              placeholder="Search Guest..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="border border-gray-200 rounded-lg px-3 py-1.5 text-xs font-bold outline-none focus:border-teal-500" 
+            />
           </div>
           
           <div className="overflow-x-auto">
@@ -107,30 +140,40 @@ function FrontDesk() {
                   <tr>
                     <td colSpan="5" className="py-8 text-center text-gray-400">Loading bookings from database...</td>
                   </tr>
-                ) : bookings.length === 0 ? (
+                ) : filteredBookings.length === 0 ? (
                   <tr>
                     <td colSpan="5" className="py-8 text-center text-gray-400">No bookings found. Make a booking from the Guest View!</td>
                   </tr>
                 ) : (
-                  bookings.map((booking, idx) => (
-                    <tr key={idx} className="border-b border-gray-50 last:border-0 hover:bg-gray-50 transition">
-                      <td className="py-4 px-2 flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center text-[10px] font-black">
-                          {booking.guest_name ? booking.guest_name.charAt(0).toUpperCase() : 'G'}
-                        </div>
-                        <div>
-                           <p>{booking.guest_name}</p>
-                           <p className="text-[9px] text-gray-400 font-medium">{booking.guest_email}</p>
-                        </div>
-                      </td>
-                      <td className="py-4 px-2 text-gray-500">BKG-{booking.id}</td>
-                      <td className="py-4 px-2 text-gray-500">Room {booking.room_number || 'N/A'}</td>
-                      <td className="py-4 px-2 text-teal-700">${booking.total_amount.toFixed(2)}</td>
-                      <td className="py-4 px-2 text-right">
-                        <button className="bg-teal-50 border border-teal-200 text-teal-700 px-4 py-1.5 rounded-lg hover:bg-teal-100 transition">Check-in</button>
-                      </td>
-                    </tr>
-                  ))
+                  filteredBookings.map((booking, idx) => {
+                    const isCheckedIn = checkedInIds.includes(booking.id);
+                    
+                    return (
+                      <tr key={idx} className={`border-b border-gray-50 last:border-0 hover:bg-gray-50 transition ${isCheckedIn ? 'opacity-50' : ''}`}>
+                        <td className="py-4 px-2 flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center text-[10px] font-black">
+                            {booking.guest_name ? booking.guest_name.charAt(0).toUpperCase() : 'G'}
+                          </div>
+                          <div>
+                             <p>{booking.guest_name}</p>
+                             <p className="text-[9px] text-gray-400 font-medium">{booking.guest_email}</p>
+                          </div>
+                        </td>
+                        <td className="py-4 px-2 text-gray-500">BKG-{booking.id}</td>
+                        <td className="py-4 px-2 text-gray-500">Room {booking.room_number || 'N/A'}</td>
+                        <td className="py-4 px-2 text-teal-700">${booking.total_amount ? booking.total_amount.toFixed(2) : '0.00'}</td>
+                        <td className="py-4 px-2 text-right">
+                          <button 
+                            onClick={() => handleCheckIn(booking.id)}
+                            disabled={isCheckedIn}
+                            className={`px-4 py-1.5 rounded-lg transition border ${isCheckedIn ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' : 'bg-teal-50 border-teal-200 text-teal-700 hover:bg-teal-100'}`}
+                          >
+                            {isCheckedIn ? 'Checked-in ✓' : 'Check-in'}
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })
                 )}
                 
               </tbody>
