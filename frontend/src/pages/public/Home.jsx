@@ -15,7 +15,7 @@ function Home({ setCurrentPage }) {
   // Toast Notification State
   const [toastMessage, setToastMessage] = useState('');
 
-  // Fully Functional IoT Room Switches
+  // Fully Functional IoT Room Switches (Clickable Cards)
   const [iotStates, setIotStates] = useState({
     climate: true,
     ambience: false,
@@ -225,7 +225,7 @@ function Home({ setCurrentPage }) {
                   <span className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest"><svg className="w-3.5 h-3.5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg> 4 Guests</span>
                   <span className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest"><svg className="w-3.5 h-3.5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg> 120m²</span>
                 </div>
-                <button onClick={() => setCurrentPage('rooms')} className="text-[9px] font-black text-cyan-400 hover:text-white uppercase tracking-widest cursor-pointer active:scale-95 transition-colors">Book Now →</button>
+                <button onClick={() => setCurrentPage('rooms')} className="text-[9px] font-black text-cyan-400 hover:text-white uppercase tracking-widest cursor-pointer active:scale-95 transition-transform">Book Now →</button>
               </div>
             </div>
           </div>
@@ -244,7 +244,7 @@ function Home({ setCurrentPage }) {
                   <span className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest"><svg className="w-3.5 h-3.5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg> 2 Guests</span>
                   <span className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest"><svg className="w-3.5 h-3.5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg> 180m²</span>
                 </div>
-                <button onClick={() => setCurrentPage('rooms')} className="text-[9px] font-black text-cyan-400 hover:text-white uppercase tracking-widest cursor-pointer active:scale-95 transition-colors">Book Now →</button>
+                <button onClick={() => setCurrentPage('rooms')} className="text-[9px] font-black text-cyan-400 hover:text-white uppercase tracking-widest cursor-pointer active:scale-95 transition-transform">Book Now →</button>
               </div>
             </div>
           </div>
@@ -263,14 +263,14 @@ function Home({ setCurrentPage }) {
                   <span className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest"><svg className="w-3.5 h-3.5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg> 2 Guests</span>
                   <span className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest"><svg className="w-3.5 h-3.5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg> 45m²</span>
                 </div>
-                <button onClick={() => setCurrentPage('rooms')} className="text-[9px] font-black text-cyan-400 hover:text-white uppercase tracking-widest cursor-pointer active:scale-95 transition-colors">Book Now →</button>
+                <button onClick={() => setCurrentPage('rooms')} className="text-[9px] font-black text-cyan-400 hover:text-white uppercase tracking-widest cursor-pointer active:scale-95 transition-transform">Book Now →</button>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 3. Fully Interactive IoT Connected Stays */}
+      {/* 3. Fully Interactive IoT Connected Stays (Clickable Cards Restored) */}
       <section className="max-w-[1550px] mx-auto px-4 md:px-8 py-20 relative border-t border-white/5">
         <div className="absolute left-0 top-1/2 w-64 h-64 bg-cyan-600/10 blur-[100px] rounded-full pointer-events-none"></div>
         <div className="flex flex-col lg:flex-row gap-16 items-center">
@@ -281,80 +281,60 @@ function Home({ setCurrentPage }) {
               Control your sanctuary <br/><span className="text-cyan-400">from your phone.</span>
             </h2>
             <p className="text-stone-500 font-bold leading-relaxed text-xs max-w-md mb-8">
-              Every HotelEase premium suite comes equipped with smart room technology. Tap the switches below to interact with the neural network.
+              Every HotelEase premium suite comes equipped with smart room technology. Tap the interactive cards below to simulate the IoT network.
             </p>
             
-            {/* Functional Toggle Switches */}
+            {/* Functional Toggle Cards */}
             <div className="grid grid-cols-2 gap-4">
               
-              {/* Climate Toggle */}
+              {/* Climate Card */}
               <div 
                 onClick={() => toggleIot('climate')}
-                className={`p-5 rounded-[1.5rem] flex flex-col justify-between cursor-pointer transition-all duration-300 min-h-[110px] active:scale-95 select-none ${iotStates.climate ? 'bg-cyan-900/20 border border-cyan-500/40 shadow-[0_0_20px_rgba(6,182,212,0.15)]' : 'bg-[#0a0a0a] border border-white/10 hover:border-white/20'}`}
+                className={`p-5 rounded-[1.5rem] flex flex-col items-center justify-center cursor-pointer transition-all duration-300 active:scale-95 select-none ${iotStates.climate ? 'bg-cyan-900/20 border border-cyan-500/40 shadow-[0_0_20px_rgba(6,182,212,0.15)]' : 'bg-[#0a0a0a] border border-white/10 hover:border-white/20'}`}
               >
-                <div className="flex justify-between items-center w-full">
-                  <span className={`text-[9px] font-black uppercase tracking-widest transition-colors ${iotStates.climate ? 'text-cyan-400' : 'text-stone-500'}`}>CLIMATE</span>
-                  <div className={`w-8 h-4 rounded-full p-0.5 flex items-center transition-colors duration-300 ${iotStates.climate ? 'bg-cyan-500' : 'bg-stone-700'}`}>
-                    <div className={`w-3 h-3 rounded-full bg-white shadow-md transform transition-transform duration-300 ${iotStates.climate ? 'translate-x-4' : 'translate-x-0'}`}></div>
-                  </div>
-                </div>
-                <span className={`text-xs font-bold mt-4 transition-colors ${iotStates.climate ? 'text-white' : 'text-stone-500'}`}>
+                <span className={`text-[9px] font-black uppercase tracking-widest mb-1 transition-colors ${iotStates.climate ? 'text-cyan-400' : 'text-stone-500'}`}>CLIMATE</span>
+                <span className={`text-xs font-bold transition-colors ${iotStates.climate ? 'text-white' : 'text-stone-500'}`}>
                   {iotStates.climate ? '22.5°C Stabilized' : 'System Off'}
                 </span>
               </div>
 
-              {/* Ambience Toggle */}
+              {/* Ambience Card */}
               <div 
                 onClick={() => toggleIot('ambience')}
-                className={`p-5 rounded-[1.5rem] flex flex-col justify-between cursor-pointer transition-all duration-300 min-h-[110px] active:scale-95 select-none ${iotStates.ambience ? 'bg-purple-900/20 border border-purple-500/40 shadow-[0_0_20px_rgba(168,85,247,0.15)]' : 'bg-[#0a0a0a] border border-white/10 hover:border-white/20'}`}
+                className={`p-5 rounded-[1.5rem] flex flex-col items-center justify-center cursor-pointer transition-all duration-300 active:scale-95 select-none ${iotStates.ambience ? 'bg-purple-900/20 border border-purple-500/40 shadow-[0_0_20px_rgba(168,85,247,0.15)]' : 'bg-[#0a0a0a] border border-white/10 hover:border-white/20'}`}
               >
-                <div className="flex justify-between items-center w-full">
-                  <span className={`text-[9px] font-black uppercase tracking-widest transition-colors ${iotStates.ambience ? 'text-purple-400' : 'text-stone-500'}`}>AMBIENCE</span>
-                  <div className={`w-8 h-4 rounded-full p-0.5 flex items-center transition-colors duration-300 ${iotStates.ambience ? 'bg-purple-500' : 'bg-stone-700'}`}>
-                    <div className={`w-3 h-3 rounded-full bg-white shadow-md transform transition-transform duration-300 ${iotStates.ambience ? 'translate-x-4' : 'translate-x-0'}`}></div>
-                  </div>
-                </div>
-                <span className={`text-xs font-bold mt-4 transition-colors ${iotStates.ambience ? 'text-white' : 'text-stone-500'}`}>
+                <span className={`text-[9px] font-black uppercase tracking-widest mb-1 transition-colors ${iotStates.ambience ? 'text-purple-400' : 'text-stone-500'}`}>AMBIENCE</span>
+                <span className={`text-xs font-bold transition-colors ${iotStates.ambience ? 'text-white' : 'text-stone-500'}`}>
                   {iotStates.ambience ? 'Neon Relax Mode' : 'Standard Lighting'}
                 </span>
               </div>
 
-              {/* Audio Toggle */}
+              {/* Audio Card */}
               <div 
                 onClick={() => toggleIot('audio')}
-                className={`p-5 rounded-[1.5rem] flex flex-col justify-between cursor-pointer transition-all duration-300 min-h-[110px] active:scale-95 select-none ${iotStates.audio ? 'bg-cyan-900/20 border border-cyan-500/40 shadow-[0_0_20px_rgba(6,182,212,0.15)]' : 'bg-[#0a0a0a] border border-white/10 hover:border-white/20'}`}
+                className={`p-5 rounded-[1.5rem] flex flex-col items-center justify-center cursor-pointer transition-all duration-300 active:scale-95 select-none ${iotStates.audio ? 'bg-cyan-900/20 border border-cyan-500/40 shadow-[0_0_20px_rgba(6,182,212,0.15)]' : 'bg-[#0a0a0a] border border-white/10 hover:border-white/20'}`}
               >
-                <div className="flex justify-between items-center w-full">
-                  <span className={`text-[9px] font-black uppercase tracking-widest transition-colors ${iotStates.audio ? 'text-cyan-400' : 'text-stone-500'}`}>AUDIO</span>
-                  <div className={`w-8 h-4 rounded-full p-0.5 flex items-center transition-colors duration-300 ${iotStates.audio ? 'bg-cyan-500' : 'bg-stone-700'}`}>
-                    <div className={`w-3 h-3 rounded-full bg-white shadow-md transform transition-transform duration-300 ${iotStates.audio ? 'translate-x-4' : 'translate-x-0'}`}></div>
-                  </div>
-                </div>
-                <span className={`text-xs font-bold mt-4 transition-colors ${iotStates.audio ? 'text-white' : 'text-stone-500'}`}>
+                <span className={`text-[9px] font-black uppercase tracking-widest mb-1 transition-colors ${iotStates.audio ? 'text-cyan-400' : 'text-stone-500'}`}>AUDIO</span>
+                <span className={`text-xs font-bold transition-colors ${iotStates.audio ? 'text-white' : 'text-stone-500'}`}>
                   {iotStates.audio ? 'Playing: Cyber-Jazz' : 'Muted'}
                 </span>
               </div>
 
-              {/* Security Toggle */}
+              {/* Security Card */}
               <div 
                 onClick={() => toggleIot('security')}
-                className={`p-5 rounded-[1.5rem] flex flex-col justify-between cursor-pointer transition-all duration-300 min-h-[110px] active:scale-95 select-none ${iotStates.security ? 'bg-green-900/20 border border-green-500/40 shadow-[0_0_20px_rgba(34,197,94,0.15)]' : 'bg-[#0a0a0a] border border-white/10 hover:border-white/20'}`}
+                className={`p-5 rounded-[1.5rem] flex flex-col items-center justify-center cursor-pointer transition-all duration-300 active:scale-95 select-none ${iotStates.security ? 'bg-green-900/20 border border-green-500/40 shadow-[0_0_20px_rgba(34,197,94,0.15)]' : 'bg-red-900/10 border border-red-500/30'}`}
               >
-                <div className="flex justify-between items-center w-full">
-                  <span className={`text-[9px] font-black uppercase tracking-widest transition-colors ${iotStates.security ? 'text-green-400' : 'text-stone-500'}`}>SECURITY</span>
-                  <div className={`w-8 h-4 rounded-full p-0.5 flex items-center transition-colors duration-300 ${iotStates.security ? 'bg-green-500' : 'bg-stone-700'}`}>
-                    <div className={`w-3 h-3 rounded-full bg-white shadow-md transform transition-transform duration-300 ${iotStates.security ? 'translate-x-4' : 'translate-x-0'}`}></div>
-                  </div>
-                </div>
-                <span className={`text-xs font-bold mt-4 transition-colors ${iotStates.security ? 'text-white' : 'text-stone-500'}`}>
+                <span className={`text-[9px] font-black uppercase tracking-widest mb-1 transition-colors ${iotStates.security ? 'text-green-400' : 'text-red-400'}`}>SECURITY</span>
+                <span className={`text-xs font-bold transition-colors ${iotStates.security ? 'text-white' : 'text-red-300'}`}>
                   {iotStates.security ? 'Biometric Armed' : 'System Unlocked'}
                 </span>
               </div>
               
-              {/* Eco Telemetry Toggle */}
+              {/* Eco Telemetry Card */}
               <div 
                 onClick={() => toggleIot('eco')}
-                className={`col-span-2 p-5 rounded-[1.5rem] flex items-center justify-between cursor-pointer transition-all duration-300 active:scale-95 select-none ${iotStates.eco ? 'bg-teal-950/20 border border-teal-500/30 shadow-inner' : 'bg-[#0a0a0a] border border-white/10'}`}
+                className={`col-span-2 p-5 rounded-[1.5rem] flex items-center justify-center cursor-pointer transition-all duration-300 active:scale-95 select-none ${iotStates.eco ? 'bg-teal-950/20 border border-teal-500/30 shadow-inner' : 'bg-[#0a0a0a] border border-white/10'}`}
               >
                 <div className="flex items-center gap-4">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${iotStates.eco ? 'bg-teal-500/10 text-teal-400' : 'bg-white/5 text-stone-600'}`}>
@@ -366,9 +346,6 @@ function Home({ setCurrentPage }) {
                       {iotStates.eco ? '100% Carbon Neutral AI Ops' : 'Standard Grid Power'}
                     </span>
                   </div>
-                </div>
-                <div className={`w-10 h-5 rounded-full p-0.5 flex items-center transition-colors duration-300 ${iotStates.eco ? 'bg-teal-500' : 'bg-stone-700'}`}>
-                  <div className={`w-4 h-4 rounded-full bg-white shadow-md transform transition-transform duration-300 ${iotStates.eco ? 'translate-x-5' : 'translate-x-0'}`}></div>
                 </div>
               </div>
 
