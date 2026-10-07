@@ -39,6 +39,14 @@ function Home({ setCurrentPage }) {
 
   const handleSearchSubmit = () => {
     setIsProcessing(true);
+    
+    // হোম পেজের সার্চ কুয়েরি লোকাল স্টোরেজে সেভ করা হচ্ছে যাতে Rooms পেজ রিসিভ করতে পারে
+    if (searchMode === 'smart') {
+      localStorage.setItem('hotelSearchQuery', aiSearchInput);
+    } else {
+      localStorage.setItem('hotelSearchQuery', manualSearch.destination);
+    }
+
     // Simulate AI Processing time before routing
     setTimeout(() => {
       setIsProcessing(false);
@@ -270,7 +278,7 @@ function Home({ setCurrentPage }) {
         </div>
       </section>
 
-      {/* 3. Fully Interactive IoT Connected Stays (Clickable Cards Restored) */}
+      {/* 3. Fully Interactive IoT Connected Stays */}
       <section className="max-w-[1550px] mx-auto px-4 md:px-8 py-20 relative border-t border-white/5">
         <div className="absolute left-0 top-1/2 w-64 h-64 bg-cyan-600/10 blur-[100px] rounded-full pointer-events-none"></div>
         <div className="flex flex-col lg:flex-row gap-16 items-center">
@@ -359,7 +367,7 @@ function Home({ setCurrentPage }) {
         </div>
       </section>
 
-      {/* 4. 360° VR Previews (Functional Modal Launcher) */}
+      {/* 4. 360° VR Previews */}
       <section className="py-20 px-4 md:px-8 relative border-t border-white/5">
         <div className="absolute inset-0 bg-white/[0.01] pointer-events-none"></div>
         <div className="max-w-[1550px] mx-auto text-center relative z-10">

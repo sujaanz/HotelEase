@@ -13,6 +13,10 @@ function RoomsSearch({ rooms = [], setCurrentPage }) {
   const [activeModalRoom, setActiveModalRoom] = useState(null);
   const [isCompareOpen, setIsCompareOpen] = useState(false);
 
+  // Interactive Popup States for Calendar & Occupancy Modals
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [isOccupancyOpen, setIsOccupancyOpen] = useState(false);
+
   // Currency Exchange Rates
   const currencyRates = {
     USD: { symbol: '$', rate: 1 },
@@ -25,14 +29,16 @@ function RoomsSearch({ rooms = [], setCurrentPage }) {
     return `${currencyRates[currency].symbol}${converted.toFixed(0)}`;
   };
 
-  // Interactive Search Parameters State
+  // Clean Search Parameters State (No Dummy Data)
   const [searchParams, setSearchParams] = useState({
-    location: 'Kyoto Sector, Japan',
-    dates: 'Oct 15 - Oct 20',
-    occupancy: '2 Adults, 1 Suite'
+    location: '',
+    checkIn: '',
+    checkOut: '',
+    adults: 1,
+    roomsCount: 1
   });
 
-  // Sync Search Query from Home Page (LocalStorage Fix)
+  // Sync Search Query from Home Page (LocalStorage)
   useEffect(() => {
     const savedQuery = localStorage.getItem('hotelSearchQuery');
     if (savedQuery) {
@@ -90,10 +96,10 @@ function RoomsSearch({ rooms = [], setCurrentPage }) {
   };
 
   const defaultRooms = [
-    { id: 101, room_number: '101', room_type: 'King Suite', price_per_night: 250, match: '98%', features: ['Eco-Smart', 'Biometric'], location: 'Kyoto' },
-    { id: 102, room_number: '102', room_type: 'Executive Penthouse', price_per_night: 650, match: '95%', features: ['Private Balcony', 'AI Butler'], location: 'Kyoto' },
-    { id: 103, room_number: '103', room_type: 'Zen Garden Villa', price_per_night: 420, match: '92%', features: ['Onsen Bath', 'Net-Zero'], location: 'Tokyo' },
-    { id: 104, room_number: '104', room_type: 'Cyber Deluxe', price_per_night: 310, match: '90%', features: ['Spatial Audio', 'Holo-Desk'], location: 'Osaka' }
+    { id: 101, room_number: '101', room_type: 'King Suite', price_per_night: 250, match: '98%', features: ['Eco-Smart', 'Biometric', 'IoT Climate'], location: 'Kyoto' },
+    { id: 102, room_number: '102', room_type: 'Executive Penthouse', price_per_night: 650, match: '95%', features: ['Private Balcony', 'AI Butler', 'Robot Concierge'], location: 'Kyoto' },
+    { id: 103, room_number: '103', room_type: 'Zen Garden Villa', price_per_night: 420, match: '92%', features: ['Onsen Bath', 'Net-Zero', 'Biometric Entry'], location: 'Tokyo' },
+    { id: 104, room_number: '104', room_type: 'Cyber Deluxe', price_per_night: 310, match: '90%', features: ['Spatial Audio', 'Holo-Desk', 'AI Assistant'], location: 'Osaka' }
   ];
 
   const dataSource = Array.isArray(rooms) && rooms.length > 0 ? rooms : defaultRooms;
@@ -102,14 +108,33 @@ function RoomsSearch({ rooms = [], setCurrentPage }) {
   const filteredRooms = dataSource.filter(room => {
     const price = Number(room.price_per_night || room.price || 450);
     const type = room.room_type || room.type || 'Suite';
-    const roomLocation = room.location || searchParams.location;
+    const roomLocation = room.location || '';
+    const roomFeatures = room.features || [];
 
     const matchesPrice = price <= maxPrice;
-    const matchesMode = selectedMode === 'All' || type.toLowerCase().includes(selectedMode.toLowerCase());
-    const matchesLocation = !searchParams.location || roomLocation.toLowerCase().includes(searchParams.location.toLowerCase()) || type.toLowerCase().includes(searchParams.location.toLowerCase());
-    const matchesEco = !sustainabilityEco || (room.features && room.features.includes('Net-Zero')) || type.toLowerCase().includes('villa');
+    
+    // Experience Mode Matching
+    const matchesMode = 
+      selectedMode === 'All' || 
+      (selectedMode === 'Deep Sleep Optimization' && (type.toLowerCase().includes('suite') || roomFeatures.includes('Eco-Smart'))) ||
+      (selectedMode === 'Executive Workstation' && (type.toLowerCase().includes('penthouse') || type.toLowerCase().includes('deluxe'))) ||
+      (selectedMode === 'Wellness & Spa Retreat' && (type.toLowerCase().includes('villa') || roomFeatures.includes('Onsen Bath')));
 
-    return matchesPrice && matchesMode && matchesLocation && matchesEco;
+    // Dynamic Location Search Matching
+    const matchesLocation = !searchParams.location || 
+      roomLocation.toLowerCase().includes(searchParams.location.toLowerCase()) || 
+      type.toLowerCase().includes(searchParams.location.toLowerCase());
+
+    const matchesEco = !sustainabilityEco || roomFeatures.includes('Net-Zero') || roomFeatures.includes('Eco-Smart') || type.toLowerCase().includes('villa');
+
+    // Smart Amenities Filtering
+    const matchesAmenities = 
+      (!amenities.iotClimate || roomFeatures.some(f => f.toLowerCase().includes('climate') || f.toLowerCase().includes('iot') || f.toLowerCase().includes('eco'))) &&
+      (!amenities.robotConcierge || roomFeatures.some(f => f.toLowerCase().includes('concierge') || f.toLowerCase().includes('robot') || f.toLowerCase().includes('butler'))) &&
+      (!amenities.biometricEntry || roomFeatures.some(f => f.toLowerCase().includes('biometric') || f.toLowerCase().includes('entry'))) &&
+      (!amenities.aiAssistant || roomFeatures.some(f => f.toLowerCase().includes('ai') || f.toLowerCase().includes('assistant')));
+
+    return matchesPrice && matchesMode && matchesLocation && matchesEco && matchesAmenities;
   }).sort((a, b) => {
     const priceA = Number(a.price_per_night || a.price || 450);
     const priceB = Number(b.price_per_night || b.price || 450);
@@ -131,6 +156,7 @@ function RoomsSearch({ rooms = [], setCurrentPage }) {
         {/* Top Header & Navigation Bar */}
         <div className="flex flex-col md:flex-row justify-between items-center bg-[#060606] border border-white/5 p-5 md:p-6 rounded-[2.5rem] backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] gap-4">
           <button 
+            type="button"
             onClick={() => setCurrentPage ? setCurrentPage('home') : window.location.href = '/'} 
             className="px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-stone-300 hover:bg-white/10 hover:text-cyan-400 text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 shadow-sm cursor-pointer"
           >
@@ -144,6 +170,7 @@ function RoomsSearch({ rooms = [], setCurrentPage }) {
               {['USD', 'EUR', 'GBP'].map((curr) => (
                 <button
                   key={curr}
+                  type="button"
                   onClick={() => setCurrency(curr)}
                   className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all cursor-pointer ${currency === curr ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/40' : 'text-stone-500 hover:text-stone-300'}`}
                 >
@@ -154,6 +181,7 @@ function RoomsSearch({ rooms = [], setCurrentPage }) {
 
             {compareList.length > 0 && (
               <button 
+                type="button"
                 onClick={() => setIsCompareOpen(true)}
                 className="px-4 py-2.5 rounded-xl bg-cyan-500/20 border border-cyan-500/40 text-cyan-400 text-[9px] font-black uppercase tracking-widest hover:bg-cyan-500/30 transition cursor-pointer"
               >
@@ -168,7 +196,7 @@ function RoomsSearch({ rooms = [], setCurrentPage }) {
           </div>
         </div>
 
-        {/* Top Search Console (Directly Editable by User) */}
+        {/* Top Search Console (Clean Inputs & Safe Sync Button) */}
         <div className="bg-[#060606] border border-white/10 rounded-[2.5rem] p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 shadow-[0_25px_60px_rgba(0,0,0,0.8)]">
           
           {/* Location Input */}
@@ -180,41 +208,39 @@ function RoomsSearch({ rooms = [], setCurrentPage }) {
                 type="text" 
                 value={searchParams.location}
                 onChange={(e) => setSearchParams({ ...searchParams, location: e.target.value })}
-                placeholder="Enter city or sector..."
+                placeholder="Search city, sector or suite..."
                 className="w-full bg-transparent border-none outline-none text-xs font-bold text-white placeholder-stone-500"
               />
             </div>
           </div>
           
-          {/* Dates Input */}
-          <div className="bg-[#0a0a0a] rounded-2xl px-4 py-3 text-white flex items-center gap-3 border border-white/5 shadow-inner">
+          {/* Temporal Span */}
+          <div 
+            onClick={() => setIsCalendarOpen(true)}
+            className="bg-[#0a0a0a] rounded-2xl px-4 py-3 text-white flex items-center gap-3 border border-white/5 shadow-inner cursor-pointer hover:border-cyan-500/30 transition-all"
+          >
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-5 h-5 text-cyan-400 flex-shrink-0"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
             <div className="flex flex-col flex-1 min-w-0">
               <span className="text-[8px] text-stone-500 uppercase tracking-widest font-black">Temporal Span</span>
-              <input 
-                type="text" 
-                value={searchParams.dates}
-                onChange={(e) => setSearchParams({ ...searchParams, dates: e.target.value })}
-                className="w-full bg-transparent border-none outline-none text-xs font-bold text-white placeholder-stone-500"
-              />
+              <span className="text-xs font-bold text-white truncate">
+                {searchParams.checkIn && searchParams.checkOut ? `${searchParams.checkIn} to ${searchParams.checkOut}` : 'Select dates...'}
+              </span>
             </div>
           </div>
           
-          {/* Occupancy Input */}
-          <div className="bg-[#0a0a0a] rounded-2xl px-4 py-3 text-white flex items-center gap-3 border border-white/5 shadow-inner">
+          {/* Occupancy Matrix */}
+          <div 
+            onClick={() => setIsOccupancyOpen(true)}
+            className="bg-[#0a0a0a] rounded-2xl px-4 py-3 text-white flex items-center gap-3 border border-white/5 shadow-inner cursor-pointer hover:border-cyan-500/30 transition-all"
+          >
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-5 h-5 text-cyan-400 flex-shrink-0"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
             <div className="flex flex-col flex-1 min-w-0">
               <span className="text-[8px] text-stone-500 uppercase tracking-widest font-black">Occupancy Matrix</span>
-              <input 
-                type="text" 
-                value={searchParams.occupancy}
-                onChange={(e) => setSearchParams({ ...searchParams, occupancy: e.target.value })}
-                className="w-full bg-transparent border-none outline-none text-xs font-bold text-white placeholder-stone-500"
-              />
+              <span className="text-xs font-bold text-white truncate">{searchParams.adults} Adults, {searchParams.roomsCount} Suite</span>
             </div>
           </div>
 
-          {/* Voice Search & Action Button */}
+          {/* Voice Search & Safe Sync Search Button */}
           <div className="flex gap-2 items-center">
             <button 
               type="button"
@@ -226,6 +252,9 @@ function RoomsSearch({ rooms = [], setCurrentPage }) {
             </button>
             <button 
               type="button"
+              onClick={() => {
+                // Safe Sync: Keeps parameters intact, just applies reactive search feedback
+              }}
               className="flex-1 bg-gradient-to-r from-teal-600 to-cyan-500 hover:from-teal-500 hover:to-cyan-400 text-black font-black text-[10px] uppercase tracking-[0.2em] py-4 rounded-2xl transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)] text-center cursor-pointer"
             >
               Sync Search
@@ -367,6 +396,7 @@ function RoomsSearch({ rooms = [], setCurrentPage }) {
                             {formatPrice(roomPrice)} / night
                           </div>
                           <button 
+                            type="button"
                             onClick={() => toggleFavorite(roomId)}
                             className={`absolute top-4 left-4 w-9 h-9 rounded-full flex items-center justify-center backdrop-blur-md border transition-all cursor-pointer ${isFav ? 'bg-red-500/20 border-red-500/50 text-red-400' : 'bg-black/60 border-white/10 text-white hover:text-cyan-400'}`}
                           >
@@ -385,12 +415,14 @@ function RoomsSearch({ rooms = [], setCurrentPage }) {
                           
                           <div className="pt-4 border-t border-white/5 flex items-center justify-between gap-3">
                             <button 
+                              type="button"
                               onClick={() => toggleCompare(roomId)}
                               className={`text-[9px] font-black uppercase tracking-widest px-3 py-2 rounded-xl border transition-all cursor-pointer ${isCompared ? 'bg-cyan-500/20 border-cyan-500/40 text-cyan-400' : 'bg-[#0a0a0a] border-white/10 text-stone-400 hover:text-white'}`}
                             >
                               {isCompared ? 'Compared' : '+ Compare'}
                             </button>
                             <button 
+                              type="button"
                               onClick={() => setActiveModalRoom(room)}
                               className="text-[9px] font-black text-cyan-400 hover:text-white uppercase tracking-widest cursor-pointer active:scale-95 transition-transform"
                             >
@@ -443,11 +475,105 @@ function RoomsSearch({ rooms = [], setCurrentPage }) {
 
       </div>
 
-      {/* Room Details Modal with CORRECT App.jsx Route ('checkout') */}
+      {/* Interactive Calendar Modal */}
+      {isCalendarOpen && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+          <div className="w-full max-w-md bg-[#060606] border border-white/10 rounded-[2.5rem] p-6 shadow-2xl">
+            <h3 className="text-sm font-black text-white uppercase tracking-widest mb-4">Select Temporal Span</h3>
+            <div className="space-y-4 mb-6">
+              <div>
+                <label className="text-[9px] font-black text-stone-500 uppercase tracking-widest block mb-1">Check-in Date</label>
+                <input 
+                  type="date" 
+                  value={searchParams.checkIn} 
+                  onChange={(e) => setSearchParams({ ...searchParams, checkIn: e.target.value })}
+                  className="w-full bg-[#0a0a0a] border border-white/10 rounded-xl p-3 text-xs font-bold text-white outline-none focus:border-cyan-400" 
+                />
+              </div>
+              <div>
+                <label className="text-[9px] font-black text-stone-500 uppercase tracking-widest block mb-1">Check-out Date</label>
+                <input 
+                  type="date" 
+                  value={searchParams.checkOut} 
+                  onChange={(e) => setSearchParams({ ...searchParams, checkOut: e.target.value })}
+                  className="w-full bg-[#0a0a0a] border border-white/10 rounded-xl p-3 text-xs font-bold text-white outline-none focus:border-cyan-400" 
+                />
+              </div>
+            </div>
+            <button 
+              type="button"
+              onClick={() => setIsCalendarOpen(false)}
+              className="w-full py-3.5 bg-cyan-400 text-black font-black text-[10px] uppercase tracking-widest rounded-xl cursor-pointer"
+            >
+              Confirm Dates
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Interactive Occupancy Modal */}
+      {isOccupancyOpen && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+          <div className="w-full max-w-md bg-[#060606] border border-white/10 rounded-[2.5rem] p-6 shadow-2xl">
+            <h3 className="text-sm font-black text-white uppercase tracking-widest mb-6">Configure Occupancy</h3>
+            <div className="space-y-6 mb-6">
+              <div className="flex justify-between items-center bg-[#0a0a0a] p-4 rounded-2xl border border-white/5">
+                <div>
+                  <p className="text-xs font-bold text-white">Adults</p>
+                  <p className="text-[9px] text-stone-500 uppercase tracking-widest">Ages 13 or above</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button 
+                    type="button"
+                    onClick={() => setSearchParams(prev => ({ ...prev, adults: Math.max(1, prev.adults - 1) }))}
+                    className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white font-bold cursor-pointer hover:bg-white/10"
+                  >-</button>
+                  <span className="text-sm font-mono font-bold text-cyan-400">{searchParams.adults}</span>
+                  <button 
+                    type="button"
+                    onClick={() => setSearchParams(prev => ({ ...prev, adults: prev.adults + 1 }))}
+                    className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white font-bold cursor-pointer hover:bg-white/10"
+                  >+</button>
+                </div>
+              </div>
+
+              <div className="flex justify-between items-center bg-[#0a0a0a] p-4 rounded-2xl border border-white/5">
+                <div>
+                  <p className="text-xs font-bold text-white">Suites / Rooms</p>
+                  <p className="text-[9px] text-stone-500 uppercase tracking-widest">Number of units</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button 
+                    type="button"
+                    onClick={() => setSearchParams(prev => ({ ...prev, roomsCount: Math.max(1, prev.roomsCount - 1) }))}
+                    className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white font-bold cursor-pointer hover:bg-white/10"
+                  >-</button>
+                  <span className="text-sm font-mono font-bold text-cyan-400">{searchParams.roomsCount}</span>
+                  <button 
+                    type="button"
+                    onClick={() => setSearchParams(prev => ({ ...prev, roomsCount: prev.roomsCount + 1 }))}
+                    className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white font-bold cursor-pointer hover:bg-white/10"
+                  >+</button>
+                </div>
+              </div>
+            </div>
+            <button 
+              type="button"
+              onClick={() => setIsOccupancyOpen(false)}
+              className="w-full py-3.5 bg-cyan-400 text-black font-black text-[10px] uppercase tracking-widest rounded-xl cursor-pointer"
+            >
+              Confirm Matrix
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Room Details Modal */}
       {activeModalRoom && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/90 backdrop-blur-xl p-4">
           <div className="w-full max-w-2xl bg-[#060606] border border-white/10 rounded-[3rem] p-8 shadow-[0_0_80px_rgba(6,182,212,0.3)] relative">
             <button 
+              type="button"
               onClick={() => setActiveModalRoom(null)}
               className="absolute top-6 right-6 w-10 h-10 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full flex items-center justify-center text-white transition-colors cursor-pointer"
             >
@@ -471,13 +597,13 @@ function RoomsSearch({ rooms = [], setCurrentPage }) {
             <div className="flex items-center justify-between pt-4 border-t border-white/5">
               <span className="text-lg font-black font-mono text-white">{formatPrice(activeModalRoom.price_per_night || activeModalRoom.price || 450)} <span className="text-xs text-stone-500 font-sans">/ night</span></span>
               
-              {/* Correct route: setCurrentPage('checkout') matches App.jsx */}
               <button 
+                type="button"
                 onClick={() => {
                   localStorage.setItem('selectedRoomToBook', JSON.stringify({
                     ...activeModalRoom,
-                    dates: searchParams.dates,
-                    occupancy: searchParams.occupancy
+                    dates: searchParams.checkIn && searchParams.checkOut ? `${searchParams.checkIn} to ${searchParams.checkOut}` : 'Oct 15 - Oct 20',
+                    occupancy: `${searchParams.adults} Adults, ${searchParams.roomsCount} Suite`
                   }));
                   setActiveModalRoom(null);
                   if (setCurrentPage) {
@@ -500,6 +626,7 @@ function RoomsSearch({ rooms = [], setCurrentPage }) {
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/90 backdrop-blur-xl p-4">
           <div className="w-full max-w-4xl bg-[#060606] border border-white/10 rounded-[3rem] p-8 shadow-[0_0_80px_rgba(6,182,212,0.3)] relative">
             <button 
+              type="button"
               onClick={() => setIsCompareOpen(false)}
               className="absolute top-6 right-6 w-10 h-10 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full flex items-center justify-center text-white transition-colors cursor-pointer"
             >
@@ -516,6 +643,7 @@ function RoomsSearch({ rooms = [], setCurrentPage }) {
                     <p className="text-xs font-mono text-cyan-400">{formatPrice(suite.price_per_night || suite.price || 450)} / night</p>
                     <p className="text-[10px] text-stone-400 font-bold">Match Score: {suite.match || '95%'}</p>
                     <button 
+                      type="button"
                       onClick={() => setCompareList(prev => prev.filter(item => item !== id))}
                       className="text-[9px] font-black text-red-400 hover:text-red-300 uppercase tracking-widest pt-2 block cursor-pointer"
                     >
@@ -526,6 +654,7 @@ function RoomsSearch({ rooms = [], setCurrentPage }) {
               })}
             </div>
             <button 
+              type="button"
               onClick={() => setIsCompareOpen(false)}
               className="w-full py-4 bg-cyan-400 text-black font-black text-[10px] uppercase tracking-[0.2em] rounded-2xl cursor-pointer"
             >
@@ -539,7 +668,4 @@ function RoomsSearch({ rooms = [], setCurrentPage }) {
   );
 }
 
-### পরিবর্তন কী করা হয়েছে:
-- আপনার `App.jsx` ফাইলে বুকিং পেজের সঠিক রাউটটি দেওয়া আছে **`'checkout'`** নামে। 
-- তাই `RoomsSearch.jsx`-এর "Book Suite Now" বাটনে এখন সঠিকভাবে `setCurrentPage('checkout')` সেট করে দেওয়া হয়েছে। 
-- এখন আপনি কোনো রুম সিলেক্ট করে বুকিং বাটনে ক্লিক করলে তা সরাসরি আপনার আসল `BookingCheckout.jsx` পেজে চলে যাবে এবং রুমের সমস্ত ডেটা লোকাল স্টোরেজে পাস করে দেবে।
+export default RoomsSearch;
