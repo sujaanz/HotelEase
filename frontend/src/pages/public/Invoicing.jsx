@@ -42,33 +42,33 @@ function Invoicing({ setCurrentPage }) {
   };
 
   return (
-    <div className="w-full min-h-[100vh] bg-[#020202] text-stone-200 font-sans selection:bg-cyan-500 selection:text-black px-4 md:px-8 py-10 relative overflow-hidden">
+    <div className="w-full min-h-[100vh] bg-[#020202] text-stone-200 font-sans selection:bg-cyan-500 selection:text-black px-4 md:px-8 py-10 relative overflow-x-hidden">
       
       {/* Background Holographic Glows */}
       <div className="absolute top-[0%] right-[10%] w-[50%] h-[50%] bg-teal-500/10 blur-[150px] rounded-full animate-pulse pointer-events-none"></div>
       <div className="absolute bottom-[20%] left-[10%] w-[40%] h-[40%] bg-cyan-600/10 blur-[150px] rounded-full animate-pulse pointer-events-none" style={{ animationDelay: '2s' }}></div>
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
 
-      <div className="max-w-[1150px] mx-auto space-y-8 relative z-10">
+      <div className="max-w-[1150px] mx-auto space-y-8 relative z-10 w-full">
         
         {/* Top Control Bar (Hidden during print) */}
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4 print:hidden bg-[#080808] border border-white/5 p-4 rounded-2xl backdrop-blur-2xl shadow-lg">
           <button 
             onClick={() => setCurrentPage ? setCurrentPage('home') : window.location.href = '/'} 
-            className="px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-stone-300 hover:bg-white/10 hover:text-cyan-400 text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2"
+            className="px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-stone-300 hover:bg-white/10 hover:text-cyan-400 text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 cursor-pointer"
           >
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
             Exit Terminal (Dashboard)
           </button>
 
-          {/* New Feature: Currency & Share Tools */}
-          <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
-            <div className="bg-[#0a0a0a] p-1 rounded-xl border border-white/10 flex">
+          {/* Currency & Share Tools with flex-wrap for mobile */}
+          <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto justify-end">
+            <div className="bg-[#0a0a0a] p-1 rounded-xl border border-white/10 flex flex-wrap gap-1">
               {['USD', 'EUR', 'BTC', 'QC'].map((curr) => (
                 <button
                   key={curr}
                   onClick={() => setCurrency(curr)}
-                  className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${currency === curr ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/40' : 'text-stone-500 hover:text-stone-300'}`}
+                  className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all cursor-pointer ${currency === curr ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/40' : 'text-stone-500 hover:text-stone-300'}`}
                 >
                   {curr}
                 </button>
@@ -77,14 +77,14 @@ function Invoicing({ setCurrentPage }) {
 
             <button 
               onClick={handleShareLink}
-              className="px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-stone-300 text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2"
+              className="px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-stone-300 text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 cursor-pointer"
             >
               {copiedLink ? '✓ Link Copied' : '🔗 Share Link'}
             </button>
           
             <button 
               onClick={handlePrint}
-              className="px-6 py-3 rounded-xl bg-gradient-to-r from-teal-600 to-cyan-500 hover:from-teal-500 hover:to-cyan-400 text-black font-bold text-[10px] uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(20,184,166,0.3)] transition-all duration-300 flex items-center gap-2"
+              className="px-6 py-3 rounded-xl bg-gradient-to-r from-teal-600 to-cyan-500 hover:from-teal-500 hover:to-cyan-400 text-black font-bold text-[10px] uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(20,184,166,0.3)] transition-all duration-300 flex items-center gap-2 cursor-pointer"
             >
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
               PDF / Print
@@ -92,14 +92,14 @@ function Invoicing({ setCurrentPage }) {
           </div>
         </div>
 
-        {/* Ultra-Modern Invoice Container (Printed part) */}
-        <div className="bg-[#050505] border border-white/10 rounded-[2.5rem] p-8 md:p-14 shadow-[0_30px_60px_rgba(0,0,0,0.8)] relative overflow-hidden print:bg-white print:text-black print:shadow-none print:border-none print:p-0">
+        {/* Ultra-Modern Invoice Container (Optimized padding for mobile) */}
+        <div className="bg-[#050505] border border-white/10 rounded-[2.5rem] p-5 sm:p-8 md:p-14 shadow-[0_30px_60px_rgba(0,0,0,0.8)] relative overflow-hidden print:bg-white print:text-black print:shadow-none print:border-none print:p-0">
           
           <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 blur-[80px] pointer-events-none print:hidden"></div>
 
           {/* Invoice Header */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center pb-10 mb-10 border-b border-white/5 print:border-gray-200 relative z-10">
-            <div className="mb-6 md:mb-0">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center pb-10 mb-10 border-b border-white/5 print:border-gray-200 relative z-10 gap-6">
+            <div>
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-12 h-12 bg-teal-500/10 border border-teal-500/30 text-teal-400 rounded-2xl flex items-center justify-center font-black text-xl shadow-inner print:bg-teal-900 print:text-white">
                   H
@@ -149,7 +149,7 @@ function Invoicing({ setCurrentPage }) {
 
           {/* Itemization Table */}
           <div className="mb-10 overflow-x-auto relative z-10">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full text-left border-collapse min-w-[500px]">
               <thead>
                 <tr className="border-b border-white/10 text-[10px] font-black text-stone-500 uppercase tracking-widest print:border-gray-300 print:text-gray-600">
                   <th className="py-4 px-3">Item Description</th>
@@ -184,15 +184,15 @@ function Invoicing({ setCurrentPage }) {
             </table>
           </div>
 
-          {/* New Feature: Interactive Tip Selector (Hidden on print) */}
+          {/* Interactive Tip Selector (Added flex-wrap for mobile responsiveness) */}
           <div className="mb-10 bg-[#0a0a0a] border border-white/5 p-5 rounded-2xl flex flex-col sm:flex-row justify-between items-center gap-4 print:hidden">
             <span className="text-[10px] font-black text-stone-400 uppercase tracking-widest">Add Crew / Drone Pilot Tip:</span>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2 justify-center">
               {[0, 5, 10, 15, 20].map((tip) => (
                 <button
                   key={tip}
                   onClick={() => setTipPercentage(tip)}
-                  className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${tipPercentage === tip ? 'bg-teal-500 text-black shadow-[0_0_15px_rgba(20,184,166,0.4)]' : 'bg-white/5 text-stone-400 hover:bg-white/10'}`}
+                  className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all cursor-pointer ${tipPercentage === tip ? 'bg-teal-500 text-black shadow-[0_0_15px_rgba(20,184,166,0.4)]' : 'bg-white/5 text-stone-400 hover:bg-white/10'}`}
                 >
                   {tip === 0 ? 'No Tip' : `${tip}%`}
                 </button>
