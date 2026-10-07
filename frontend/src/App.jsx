@@ -65,8 +65,17 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-between font-sans">
-      <div>
+    // মেইন কন্টেইনারটিকে গ্লোবাল ডার্ক থিম (bg-[#030303]) করে দেওয়া হয়েছে
+    // যাতে অ্যাডমিন এবং নেভবারের নতুন ডার্ক ডিজাইনের সাথে এটি পারফেক্টলি মানিয়ে যায়
+    <div className="min-h-screen bg-[#030303] text-stone-200 flex flex-col justify-between font-sans selection:bg-teal-500 selection:text-white relative overflow-hidden">
+      
+      {/* গ্লোবাল ডাইনামিক লাইটিং (অপশনাল) যা ট্রানজিশনগুলোকে আরও স্মুথ করবে */}
+      <div className="fixed top-0 left-0 w-full h-full pointer-events-none z-0 overflow-hidden">
+        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-teal-900/5 rounded-full blur-[120px]"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-cyan-900/5 rounded-full blur-[120px]"></div>
+      </div>
+
+      <div className="relative z-10 flex-1 flex flex-col">
         {/* নেভিগেশন বার (এখানে handleLogout প্রপসটি পাস করা হলো) */}
         <Navbar 
           setCurrentPage={setCurrentPage} 
@@ -75,7 +84,9 @@ function App() {
         />
 
         {/* মেইন কনটেন্ট ও রাউটিং */}
-        <main className="py-2">
+        {/* Navbar-এর ফ্লোটিং ডিজাইনের জন্য এখানে কোনো এক্সট্রা মার্জিন বা ওভারল্যাপ হবে না */}
+        <main className="flex-1 w-full relative">
+          
           {/* Public Pages */}
           {currentPage === 'home' && <Home setCurrentPage={setCurrentPage} />}
           {currentPage === 'rooms' && <RoomsSearch rooms={rooms} setCurrentPage={setCurrentPage} />}
@@ -106,7 +117,9 @@ function App() {
       </div>
 
       {/* ফুটার */}
-      <Footer setCurrentPage={setCurrentPage} />
+      <div className="relative z-10">
+        <Footer setCurrentPage={setCurrentPage} />
+      </div>
     </div>
   );
 }
