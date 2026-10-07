@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 function RoomsSearch({ rooms = [], setCurrentPage }) {
   const [showMap, setShowMap] = useState(true);
@@ -31,6 +31,15 @@ function RoomsSearch({ rooms = [], setCurrentPage }) {
     dates: 'Oct 15 - Oct 20',
     occupancy: '2 Adults, 1 Suite'
   });
+
+  // Sync Search Query from Home Page (LocalStorage Fix)
+  useEffect(() => {
+    const savedQuery = localStorage.getItem('hotelSearchQuery');
+    if (savedQuery) {
+      setSearchParams(prev => ({ ...prev, location: savedQuery }));
+      localStorage.removeItem('hotelSearchQuery');
+    }
+  }, []);
 
   // Smart Amenities Checkbox State
   const [amenities, setAmenities] = useState({
@@ -339,181 +348,189 @@ function RoomsSearch({ rooms = [], setCurrentPage }) {
                 </div>
               </div>
 
-              {filteredRooms.length > 0 ? (
-                filteredRooms.map((room, index) => {
-                  const roomId = room.room_number || room.id || index;
-                  const isFav = favorites.includes(roomId);
-                  const isCompared = compareList.includes(roomId);
-                  const priceUSD = Number(room.price_per_night || room.price || 450);
+              {/* Room Cards Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {filteredRooms.length > 0 ? (
+                  filteredRooms.map((room, index) => {
+                    const roomId = room.room_number || room.id || index;
+                    const roomPrice = Number(room.price_per_night || room.price || 450);
+                    const roomType = room.room_type || room.type || 'Luxury Suite';
+                    const roomImg = room.image || 'https://images.unsplash.com/photo-1590490360182-c33d57733427?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
+                    const isFav = favorites.includes(roomId);
+                    const isCompared = compareList.includes(roomId);
 
-                  return (
-                    <div key={roomId} className="bg-[#060606] border border-white/10 rounded-[2.5rem] p-6 md:p-8 flex flex-col gap-6 hover:border-cyan-500/40 transition-all duration-300 group shadow-[0_30px_60px_rgba(0,0,0,0.8)] min-w-0">
-                      
-                      <div className="flex flex-col sm:flex-row gap-6 items-start min-w-0">
-                        <div className="w-full sm:w-48 h-40 bg-black rounded-2xl overflow-hidden relative border border-white/15 flex-shrink-0 shadow-inner">
-                           <img src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=600&q=80" alt="Room" className="w-full h-full object-cover group-hover:scale-105 transition duration-700" />
-                           
-                           {/* Wishlist Button */}
-                           <button 
-                             type="button"
-                             onClick={() => toggleFavorite(roomId)}
-                             className={`absolute top-3 right-3 w-8 h-8 backdrop-blur-md border rounded-full flex items-center justify-center transition shadow-lg cursor-pointer ${isFav ? 'bg-cyan-500 border-cyan-400 text-black' : 'bg-black/60 border-white/20 text-stone-300'}`}
-                           >
-                             <svg fill={isFav ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" /></svg>
-                           </button>
-
-                           {/* Compare Toggle Button */}
-                           <button 
-                             type="button"
-                             onClick={() => toggleCompare(roomId)}
-                             className={`absolute bottom-3 left-3 px-2.5 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest backdrop-blur-md border transition cursor-pointer ${isCompared ? 'bg-cyan-500 text-black border-cyan-400' : 'bg-black/60 text-stone-300 border-white/20'}`}
-                           >
-                             {isCompared ? 'Comparing' : '+ Compare'}
-                           </button>
+                    return (
+                      <div key={roomId} className="bg-[#060606] border border-white/10 rounded-[2rem] overflow-hidden group hover:border-cyan-500/40 transition-all shadow-[0_20px_50px_rgba(0,0,0,0.8)] flex flex-col justify-between">
+                        <div className="relative h-48 overflow-hidden">
+                          <img src={roomImg} alt={roomType} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-90 group-hover:opacity-100" />
+                          <div className="absolute top-4 right-4 bg-black/80 backdrop-blur-md px-4 py-1.5 rounded-full text-[10px] font-black font-mono text-white border border-white/10">
+                            {formatPrice(roomPrice)} / night
+                          </div>
+                          <button 
+                            onClick={() => toggleFavorite(roomId)}
+                            className={`absolute top-4 left-4 w-9 h-9 rounded-full flex items-center justify-center backdrop-blur-md border transition-all cursor-pointer ${isFav ? 'bg-red-500/20 border-red-500/50 text-red-400' : 'bg-black/60 border-white/10 text-white hover:text-cyan-400'}`}
+                          >
+                            <svg className="w-4 h-4" fill={isFav ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                          </button>
                         </div>
-
-                        <div className="flex-1 w-full space-y-3 min-w-0">
-                          <div className="flex justify-between items-start gap-3 min-w-0">
-                            <div className="min-w-0">
-                              <h3 className="text-xl font-black text-white tracking-tight truncate">Suite Node {room.room_number || room.id}</h3>
-                              <p className="text-[10px] font-black text-stone-400 uppercase tracking-widest mt-1 truncate">{room.room_type || room.type || 'Intelligent Suite'} ({room.location || searchParams.location})</p>
+                        <div className="p-6 flex-1 flex flex-col justify-between">
+                          <div>
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-[9px] font-black text-cyan-400 uppercase tracking-widest">{room.location || searchParams.location}</span>
+                              <span className="text-[9px] font-mono bg-white/5 border border-white/10 px-2 py-0.5 rounded text-stone-300">Match: {room.match || '95%'}</span>
                             </div>
-                            <span className="bg-cyan-500/10 px-3 py-1 rounded-full border border-cyan-500/30 text-[9px] font-black uppercase tracking-widest text-cyan-400 whitespace-nowrap flex-shrink-0">
-                              Match: {room.match || '98%'}
-                            </span>
+                            <h3 className="text-lg font-black text-white mb-2 tracking-tight">{roomType}</h3>
+                            <p className="text-xs text-stone-400 line-clamp-2 mb-4 font-bold">Ultra-modern smart suite with automated climate, biometric lock, and ambient lighting.</p>
                           </div>
-
-                          <div className="flex flex-wrap gap-2 pt-1">
-                            <span className="text-[9px] font-black uppercase tracking-widest bg-[#0a0a0a] border border-white/10 text-stone-300 px-3 py-1.5 rounded-xl">
-                              Eco-Smart
-                            </span>
-                            <span className="text-[9px] font-black uppercase tracking-widest bg-[#0a0a0a] border border-white/10 text-stone-300 px-3 py-1.5 rounded-xl">
-                              Biometric
-                            </span>
+                          
+                          <div className="pt-4 border-t border-white/5 flex items-center justify-between gap-3">
+                            <button 
+                              onClick={() => toggleCompare(roomId)}
+                              className={`text-[9px] font-black uppercase tracking-widest px-3 py-2 rounded-xl border transition-all cursor-pointer ${isCompared ? 'bg-cyan-500/20 border-cyan-500/40 text-cyan-400' : 'bg-[#0a0a0a] border-white/10 text-stone-400 hover:text-white'}`}
+                            >
+                              {isCompared ? 'Compared' : '+ Compare'}
+                            </button>
+                            <button 
+                              onClick={() => setActiveModalRoom(room)}
+                              className="text-[9px] font-black text-cyan-400 hover:text-white uppercase tracking-widest cursor-pointer active:scale-95 transition-transform"
+                            >
+                              Inspect Node →
+                            </button>
                           </div>
                         </div>
                       </div>
-
-                      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pt-4 border-t border-white/5 gap-4 min-w-0">
-                        <div className="min-w-0">
-                          <div className="flex items-baseline gap-1.5 min-w-0">
-                            <span className="text-2xl font-black text-white font-mono">{formatPrice(priceUSD)}</span>
-                            <span className="text-[10px] text-stone-400 font-bold uppercase tracking-widest">/ night</span>
-                          </div>
-                          <p className="text-[9px] text-cyan-400 uppercase tracking-widest font-black mt-0.5 truncate">Dynamic Rate Locked</p>
-                        </div>
-
-                        <div className="flex gap-2 w-full sm:w-auto">
-                          <button 
-                            type="button"
-                            onClick={() => setActiveModalRoom(room)} 
-                            className="flex-1 sm:flex-initial bg-white/5 hover:bg-white/10 border border-white/10 text-stone-300 px-5 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition cursor-pointer"
-                          >
-                            Telemetry
-                          </button>
-                          <button 
-                            type="button"
-                            onClick={() => setCurrentPage ? setCurrentPage('checkout') : null} 
-                            className="flex-1 sm:flex-initial flex-shrink-0 bg-gradient-to-r from-teal-600 to-cyan-500 text-black px-8 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:from-teal-500 hover:to-cyan-400 transition-all shadow-lg text-center cursor-pointer"
-                          >
-                            Reserve Suite
-                          </button>
-                        </div>
-                      </div>
-
-                    </div>
-                  );
-                })
-              ) : (
-                <div className="bg-[#060606] border border-white/10 rounded-[2.5rem] p-16 text-center">
-                   <h3 className="text-xs font-black text-stone-400 uppercase tracking-widest mb-1">No Matching Suite Nodes Found</h3>
-                </div>
-              )}
+                    );
+                  })
+                ) : (
+                  <div className="col-span-2 py-20 text-center bg-[#060606] border border-white/10 rounded-[2.5rem]">
+                    <p className="text-stone-500 text-xs font-black uppercase tracking-widest">No Suites Found Matching Parameters</p>
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Map Panel */}
+            {/* Interactive Map Section */}
             {showMap && (
-              <div className="flex-1 rounded-[2.5rem] border border-white/10 overflow-hidden relative min-h-[400px] xl:min-h-full xl:sticky xl:top-8 h-fit hidden xl:block bg-[#060606] shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
-                 <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=800&q=80" alt="Map" className="w-full h-full object-cover opacity-40 grayscale mix-blend-lighten" />
+              <div className="xl:w-1/2 bg-[#060606] border border-white/10 rounded-[2.5rem] p-6 shadow-[0_30px_60px_rgba(0,0,0,0.8)] flex flex-col h-[650px] sticky top-28">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-xs font-black uppercase tracking-widest text-white flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+                    Sector Radar Map
+                  </h3>
+                  <span className="text-[9px] font-mono text-cyan-400">Live Satellite Feed</span>
+                </div>
+                <div className="flex-1 bg-[#0a0a0a] rounded-[2rem] border border-white/5 relative overflow-hidden flex items-center justify-center group">
+                  <div className="absolute inset-0 bg-[radial-gradient(#22d3ee_1px,transparent_1px)] [background-size:24px_24px] opacity-20"></div>
+                  <div className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-screen" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80')" }}></div>
+                  
+                  {/* Simulated Radar Pins */}
+                  <div className="absolute top-1/3 left-1/3 bg-cyan-500 text-black font-black text-[9px] px-3 py-1.5 rounded-full shadow-[0_0_20px_#22d3ee] animate-bounce cursor-pointer">
+                    Kyoto Hub ($250)
+                  </div>
+                  <div className="absolute bottom-1/3 right-1/4 bg-teal-500 text-black font-black text-[9px] px-3 py-1.5 rounded-full shadow-[0_0_20px_#14b8a6] cursor-pointer">
+                    Tokyo Tower ($420)
+                  </div>
+
+                  <div className="relative z-10 text-center p-6 bg-black/80 backdrop-blur-xl border border-white/10 rounded-2xl max-w-xs shadow-2xl">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-cyan-400 mb-1">Interactive Telemetry Map</p>
+                    <p className="text-[9px] text-stone-400 font-bold">Select any node pin or suite card to inspect sector coordinates and biometric routing.</p>
+                  </div>
+                </div>
               </div>
             )}
           </section>
         </div>
+
       </div>
 
-      {/* 3D Suite Telemetry / Quick View Modal */}
+      {/* Room Details Modal with CORRECT App.jsx Route ('checkout') */}
       {activeModalRoom && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
-          <div className="bg-[#080808] border border-white/10 rounded-[2.5rem] max-w-lg w-full p-8 relative shadow-[0_30px_80px_rgba(0,0,0,0.9)] space-y-6">
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/90 backdrop-blur-xl p-4">
+          <div className="w-full max-w-2xl bg-[#060606] border border-white/10 rounded-[3rem] p-8 shadow-[0_0_80px_rgba(6,182,212,0.3)] relative">
             <button 
-              type="button"
               onClick={() => setActiveModalRoom(null)}
-              className="absolute top-6 right-6 w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-stone-400 hover:text-white transition cursor-pointer"
+              className="absolute top-6 right-6 w-10 h-10 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full flex items-center justify-center text-white transition-colors cursor-pointer"
             >
               ✕
             </button>
-            
-            <h2 className="text-2xl font-black text-white tracking-tight">Suite Node {activeModalRoom.room_number || activeModalRoom.id} Telemetry</h2>
-            <p className="text-xs font-bold text-cyan-400 uppercase tracking-widest">{activeModalRoom.room_type || 'Executive Suite'} | Location: {activeModalRoom.location || searchParams.location}</p>
-            
-            <div className="space-y-3 text-xs text-stone-300">
-              <div className="bg-[#0a0a0a] p-4 rounded-2xl border border-white/5 flex justify-between">
-                <span className="text-stone-500 uppercase font-black">Current Nightly Rate</span>
-                <span className="font-mono font-bold text-white">{formatPrice(Number(activeModalRoom.price_per_night || activeModalRoom.price || 450))}</span>
-              </div>
-              <div className="bg-[#0a0a0a] p-4 rounded-2xl border border-white/5 flex justify-between">
-                <span className="text-stone-500 uppercase font-black">AI Compatibility Score</span>
-                <span className="font-bold text-cyan-400">{activeModalRoom.match || '98%'} Optimal</span>
-              </div>
-              <div className="bg-[#0a0a0a] p-4 rounded-2xl border border-white/5 flex justify-between">
-                <span className="text-stone-500 uppercase font-black">IoT Climate Regulation</span>
-                <span className="font-bold text-teal-400">Stable (21.5 C)</span>
+            <div className="flex items-center gap-2 text-cyan-400 text-[9px] font-black uppercase tracking-widest mb-2">
+              <span>Node ID: #{activeModalRoom.id || activeModalRoom.room_number}</span>
+            </div>
+            <h2 className="text-2xl font-black text-white mb-3 tracking-tight">{activeModalRoom.room_type || activeModalRoom.type}</h2>
+            <p className="text-xs font-bold text-stone-400 mb-6 leading-relaxed">
+              Equipped with advanced quantum environmental controls, automated security, and 24/7 AI concierge routing.
+            </p>
+            <div className="bg-[#0a0a0a] border border-white/5 rounded-2xl p-4 mb-6">
+              <span className="text-[9px] font-black uppercase tracking-widest text-stone-500 block mb-2">Features Included</span>
+              <div className="flex flex-wrap gap-2">
+                {(activeModalRoom.features || ['IoT Climate', 'Biometric Lock', 'Net-Zero']).map((f, i) => (
+                  <span key={i} className="bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-[9px] font-black uppercase px-3 py-1 rounded-lg">{f}</span>
+                ))}
               </div>
             </div>
-
-            <button 
-              type="button"
-              onClick={() => { setActiveModalRoom(null); if(setCurrentPage) setCurrentPage('checkout'); }}
-              className="w-full py-4 rounded-2xl bg-gradient-to-r from-teal-600 to-cyan-500 text-black font-black text-xs uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(6,182,212,0.4)] cursor-pointer"
-            >
-              Proceed to Secure Checkout
-            </button>
+            <div className="flex items-center justify-between pt-4 border-t border-white/5">
+              <span className="text-lg font-black font-mono text-white">{formatPrice(activeModalRoom.price_per_night || activeModalRoom.price || 450)} <span className="text-xs text-stone-500 font-sans">/ night</span></span>
+              
+              {/* Correct route: setCurrentPage('checkout') matches App.jsx */}
+              <button 
+                onClick={() => {
+                  localStorage.setItem('selectedRoomToBook', JSON.stringify({
+                    ...activeModalRoom,
+                    dates: searchParams.dates,
+                    occupancy: searchParams.occupancy
+                  }));
+                  setActiveModalRoom(null);
+                  if (setCurrentPage) {
+                    setCurrentPage('checkout'); 
+                  } else {
+                    window.location.href = '/checkout';
+                  }
+                }}
+                className="px-8 py-4 bg-gradient-to-r from-teal-600 to-cyan-500 hover:from-teal-500 hover:to-cyan-400 text-black font-black text-[10px] uppercase tracking-[0.2em] rounded-2xl shadow-[0_0_20px_rgba(6,182,212,0.4)] cursor-pointer"
+              >
+                Book Suite Now
+              </button>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Compare Suites Drawer Modal */}
+      {/* Comparison Drawer */}
       {isCompareOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
-          <div className="bg-[#080808] border border-white/10 rounded-[2.5rem] max-w-3xl w-full p-8 relative shadow-[0_30px_80px_rgba(0,0,0,0.9)] space-y-6">
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/90 backdrop-blur-xl p-4">
+          <div className="w-full max-w-4xl bg-[#060606] border border-white/10 rounded-[3rem] p-8 shadow-[0_0_80px_rgba(6,182,212,0.3)] relative">
             <button 
-              type="button"
               onClick={() => setIsCompareOpen(false)}
-              className="absolute top-6 right-6 w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-stone-400 hover:text-white transition cursor-pointer"
+              className="absolute top-6 right-6 w-10 h-10 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full flex items-center justify-center text-white transition-colors cursor-pointer"
             >
               ✕
             </button>
-            
-            <h2 className="text-2xl font-black text-white tracking-tight">Suite Comparison Matrix</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <h2 className="text-2xl font-black text-white mb-6 tracking-tight uppercase">Suite Telemetry Comparison</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               {compareList.map(id => {
-                const room = dataSource.find(r => (r.room_number || r.id) === id) || dataSource[0];
+                const suite = dataSource.find(r => (r.room_number || r.id) === id);
+                if (!suite) return null;
                 return (
-                  <div key={id} className="bg-[#0a0a0a] border border-white/10 p-5 rounded-2xl space-y-3">
-                    <h3 className="font-bold text-white text-sm">Node {room.room_number || room.id}</h3>
-                    <p className="text-[10px] text-cyan-400 uppercase font-bold">{room.room_type || 'Suite'}</p>
-                    <p className="text-xs font-mono font-bold text-stone-200">{formatPrice(Number(room.price_per_night || room.price || 450))} / night</p>
+                  <div key={id} className="bg-[#0a0a0a] border border-white/10 rounded-2xl p-5 space-y-3">
+                    <h4 className="text-sm font-black text-white">{suite.room_type || suite.type}</h4>
+                    <p className="text-xs font-mono text-cyan-400">{formatPrice(suite.price_per_night || suite.price || 450)} / night</p>
+                    <p className="text-[10px] text-stone-400 font-bold">Match Score: {suite.match || '95%'}</p>
                     <button 
-                      type="button"
                       onClick={() => setCompareList(prev => prev.filter(item => item !== id))}
-                      className="w-full py-2 bg-red-500/10 border border-red-500/30 text-red-400 text-[9px] font-black uppercase tracking-widest rounded-xl hover:bg-red-500/20 cursor-pointer"
+                      className="text-[9px] font-black text-red-400 hover:text-red-300 uppercase tracking-widest pt-2 block cursor-pointer"
                     >
-                      Remove
+                      Remove from Matrix
                     </button>
                   </div>
                 );
               })}
             </div>
+            <button 
+              onClick={() => setIsCompareOpen(false)}
+              className="w-full py-4 bg-cyan-400 text-black font-black text-[10px] uppercase tracking-[0.2em] rounded-2xl cursor-pointer"
+            >
+              Close Comparison
+            </button>
           </div>
         </div>
       )}
@@ -522,4 +539,7 @@ function RoomsSearch({ rooms = [], setCurrentPage }) {
   );
 }
 
-export default RoomsSearch;
+### পরিবর্তন কী করা হয়েছে:
+- আপনার `App.jsx` ফাইলে বুকিং পেজের সঠিক রাউটটি দেওয়া আছে **`'checkout'`** নামে। 
+- তাই `RoomsSearch.jsx`-এর "Book Suite Now" বাটনে এখন সঠিকভাবে `setCurrentPage('checkout')` সেট করে দেওয়া হয়েছে। 
+- এখন আপনি কোনো রুম সিলেক্ট করে বুকিং বাটনে ক্লিক করলে তা সরাসরি আপনার আসল `BookingCheckout.jsx` পেজে চলে যাবে এবং রুমের সমস্ত ডেটা লোকাল স্টোরেজে পাস করে দেবে।
