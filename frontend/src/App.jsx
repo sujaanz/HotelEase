@@ -65,18 +65,17 @@ function App() {
   };
 
   return (
-    // মেইন কন্টেইনারটিকে গ্লোবাল ডার্ক থিম (bg-[#030303]) করে দেওয়া হয়েছে
-    // যাতে অ্যাডমিন এবং নেভবারের নতুন ডার্ক ডিজাইনের সাথে এটি পারফেক্টলি মানিয়ে যায়
-    <div className="min-h-screen bg-[#030303] text-stone-200 flex flex-col justify-between font-sans selection:bg-teal-500 selection:text-white relative overflow-hidden">
+    // মেইন কন্টেইনারটিকে গ্লোবাল ডার্ক থিম (bg-[#030303]) করে দেওয়া হয়েছে
+    <div className="min-h-screen bg-[#030303] text-stone-200 flex flex-col justify-between font-sans selection:bg-cyan-500 selection:text-black relative overflow-hidden">
       
-      {/* গ্লোবাল ডাইনামিক লাইটিং (অপশনাল) যা ট্রানজিশনগুলোকে আরও স্মুথ করবে */}
+      {/* গ্লোবাল ডাইনামিক লাইটিং যা ট্রানজিশনগুলোকে আরও স্মুথ করবে */}
       <div className="fixed top-0 left-0 w-full h-full pointer-events-none z-0 overflow-hidden">
-        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-teal-900/5 rounded-full blur-[120px]"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-cyan-900/5 rounded-full blur-[120px]"></div>
+        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-teal-500/5 rounded-full blur-[120px]"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-cyan-600/5 rounded-full blur-[120px]"></div>
       </div>
 
       <div className="relative z-10 flex-1 flex flex-col">
-        {/* নেভিগেশন বার (এখানে handleLogout প্রপসটি পাস করা হলো) */}
+        {/* নেভিগেশন বার */}
         <Navbar 
           setCurrentPage={setCurrentPage} 
           userRole={userRole} 
@@ -84,7 +83,6 @@ function App() {
         />
 
         {/* মেইন কনটেন্ট ও রাউটিং */}
-        {/* Navbar-এর ফ্লোটিং ডিজাইনের জন্য এখানে কোনো এক্সট্রা মার্জিন বা ওভারল্যাপ হবে না */}
         <main className="flex-1 w-full relative">
           
           {/* Public Pages */}
@@ -94,14 +92,14 @@ function App() {
           {/* Auth পেজ */}
           {currentPage === 'auth' && <Auth setCurrentPage={setCurrentPage} setUserRole={setUserRole} />}
           
-          {currentPage === 'aiconcierge' && <AiConcierge />}
+          {currentPage === 'aiconcierge' && <AiConcierge setCurrentPage={setCurrentPage} />}
           {currentPage === 'checkout' && <BookingCheckout setCurrentPage={setCurrentPage} />}
           {currentPage === 'invoicing' && <Invoicing setCurrentPage={setCurrentPage} />}
-          {currentPage === 'legal' && <LegalPolicies />}
-          {currentPage === 'support' && <SupportFeedback />}
+          {currentPage === 'legal' && <LegalPolicies setCurrentPage={setCurrentPage} />}
+          {currentPage === 'support' && <SupportFeedback setCurrentPage={setCurrentPage} />}
 
           {/* Guest Pages */}
-          {currentPage === 'profile' && <GuestProfile />}
+          {currentPage === 'profile' && <GuestProfile setCurrentPage={setCurrentPage} />}
 
           {/* Admin & Enterprise Pages */}
           {currentPage === 'admin' && <AdminDashboard setCurrentPage={setCurrentPage} />}
